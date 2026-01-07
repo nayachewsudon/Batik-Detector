@@ -1,0 +1,27 @@
+# Image datasets
+train/
+test/
+train_augmented/
+test_processed/
+raw_images/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Model files
+*.h5
+*.pkl
+*.pth
+*.ckpt
+
+# IDE
+.vscode/
+.idea/
+*.swp
