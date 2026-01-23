@@ -25,6 +25,12 @@ model = models.Sequential([
     layers.Dense(3) 
 ])
 
+def apply_preprocessing(images, labels):
+    """The augmentation script converts the images back to 255 pixel intensity value, range of [0, 255].
+    This function applies preprocessing to change pixel intensity to [-1, 1]. MobileNetV2 accepts this range."""
+
+    return preprocess_input(images), labels
+
 train_ds = keras.utils.image_dataset_from_directory (
     'data/train_augmented',
     validation_split=0.2,
@@ -33,7 +39,7 @@ train_ds = keras.utils.image_dataset_from_directory (
     image_size=(224, 224),
     batch_size=32,
     label_mode='int'
-)
+).map(apply_preprocessing)
 
 val_ds = keras.utils.image_dataset_from_directory (
     'data/train_augmented',
@@ -43,7 +49,7 @@ val_ds = keras.utils.image_dataset_from_directory (
     image_size=(224, 224),
     batch_size=32,
     label_mode='int'
-)
+).map(apply_preprocessing)
 
 test_ds = keras.utils.image_dataset_from_directory(
     'data/test_processed',
@@ -51,7 +57,7 @@ test_ds = keras.utils.image_dataset_from_directory(
     batch_size=32,
     label_mode='int',
     shuffle=False
-)
+).map(apply_preprocessing)
 
 model.compile(optimizer=keras.optimizers.Adam(), 
               loss = keras.losses.SparseCategoricalCrossentropy(from_logits=True), #frim_logits expects raw outputs (logits) or probabilities
