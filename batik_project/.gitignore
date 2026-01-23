@@ -4,6 +4,7 @@ test/
 train_augmented/
 test_processed/
 raw_images/
+validation/
 
 # Python
 __pycache__/

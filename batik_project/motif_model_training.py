@@ -10,6 +10,8 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, confusion_matrix
 from tensorflow.keras.callbacks import EarlyStopping
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 base_model = MobileNetV2(
     weights = 'imagenet',
@@ -44,9 +46,6 @@ early_stop = EarlyStopping(
 #Training Data
 train_ds = keras.utils.image_dataset_from_directory (
     'data/train_augmented',
-    validation_split=0.2,
-    subset="training",
-    seed = 123,
     image_size=(224, 224),
     batch_size=32,
     label_mode='int'
@@ -54,23 +53,24 @@ train_ds = keras.utils.image_dataset_from_directory (
 
 #Validation Data
 val_ds = keras.utils.image_dataset_from_directory (
-    'data/train_augmented',
-    validation_split=0.2,
-    subset="validation",
-    seed = 123,
+    'data/validation',
     image_size=(224, 224),
     batch_size=32,
     label_mode='int'
 ).map(apply_preprocessing)
 
 #Testing Data
-test_ds = keras.utils.image_dataset_from_directory(
+raw_test_ds = keras.utils.image_dataset_from_directory(
     'data/test_processed',
     image_size=(224,224),
     batch_size=32,
     label_mode='int',
     shuffle=False
-).map(apply_preprocessing)
+)
+
+class_names = raw_test_ds.class_names
+test_ds = raw_test_ds.map(apply_preprocessing)
+
 
 model.compile(optimizer=keras.optimizers.Adam(), 
               loss = keras.losses.SparseCategoricalCrossentropy(from_logits=True), #frim_logits expects raw outputs (logits) or probabilities
@@ -102,6 +102,19 @@ y_pred = np.argmax(y_pred_probs, axis = 1)
 
 print("Classification Report: ")
 print(classification_report(y_true, y_pred, target_names=['Batik Kawung', 'Batik Megamendung', 'Batik Parang']))
+
+cm = confusion_matrix(y_true, y_pred)
+print("Confusion Matrix:\n", cm)
+
+cm_normalized = cm.astype('float') /cm.sum(axis=1)[:, np.newaxis]
+
+plt.figure(figsize=(6, 5))
+sns.heatmap(cm_normalized, annot=True, fmt='.2f', cmap='Blues',
+xticklabels=class_names, yticklabels=class_names)
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
 
 #Save Model
 model.save('batik_model.keras')
