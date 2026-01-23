@@ -55,7 +55,7 @@ train_ds = keras.utils.image_dataset_from_directory (
 val_ds = keras.utils.image_dataset_from_directory (
     'data/validation',
     image_size=(224, 224),
-    batch_size=32,
+    batch_size=16,
     label_mode='int'
 ).map(apply_preprocessing)
 
@@ -63,7 +63,7 @@ val_ds = keras.utils.image_dataset_from_directory (
 raw_test_ds = keras.utils.image_dataset_from_directory(
     'data/test_processed',
     image_size=(224,224),
-    batch_size=32,
+    batch_size=5,
     label_mode='int',
     shuffle=False
 )
