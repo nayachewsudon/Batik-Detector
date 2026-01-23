@@ -7,8 +7,6 @@ from tensorflow.keras import layers, models
 from tensorflow.keras import ops
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-import numpy as np
-import matplotlib.pyplot as plt
 
 base_model = MobileNetV2(
     weights = 'imagenet',
@@ -22,15 +20,26 @@ base_model.trainable = False
 model = models.Sequential([
     base_model,
     layers.GlobalAveragePooling2D(),
-    layers.Dense(128, activation= 'relu'), #Learn combinations of features specific to motifs
-    layers.Dropout(0.5), #Prevents overfitting
-    layers.Dense(3, activation='softmax') #output - 5 batik motifs 
+    layers.Dense(128, activation= 'relu'), 
+    layers.Dropout(0.5), 
+    layers.Dense(3) 
 ])
 
 train_ds = keras.utils.image_dataset_from_directory (
     'data/train_augmented',
     validation_split=0.2,
-    subset="both",
+    subset="training",
+    seed = 123,
+    image_size=(224, 224),
+    batch_size=32,
+    label_mode='int'
+)
+
+val_ds = keras.utils.image_dataset_from_directory (
+    'data/train_augmented',
+    validation_split=0.2,
+    subset="validation",
+    seed = 123,
     image_size=(224, 224),
     batch_size=32,
     label_mode='int'
@@ -45,7 +54,23 @@ test_ds = keras.utils.image_dataset_from_directory(
 )
 
 model.compile(optimizer=keras.optimizers.Adam(), 
-              loss = keras.losses.BinaryCrossentropy(from_logits=True),
-              metrics =[keras.metrics.BinaryAccuracy()])
+              loss = keras.losses.SparseCategoricalCrossentropy(from_logits=True), #frim_logits expects raw outputs (logits) or probabilities
+              metrics =['accuracy'])
 
-model.fit(train_ds, epochs= 20)
+print("Model Summary:")
+model.summary()
+
+print("Training starts NOW...")
+history = model.fit(
+    train_ds,
+    validation_data=val_ds, 
+    epochs = 20
+)
+
+print("Evaluate on test set NOW...")
+test_loss, test_acc = model.evaluate(test_ds)
+print(f"Test accuracy: {test_acc:.4f}")
+print(f"Test loss: {test_loss:.4f}")
+
+model.save('batik_model.keras')
+print()
