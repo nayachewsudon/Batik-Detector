@@ -5,6 +5,17 @@ Batik is an Indonesian craft which uses wax-resistant dyes to fabric in order to
 
 This web app detects batik patterns from images uploaded on the website and classifies the batik pattern. Currently, the web app is trained on a dataset of three popular batik motifs: Batik Megamendung, Batik Kawung, and Batik Parang, all carrying significant meaning and culture behind its patterns. 
 
+![Alt text](images/batik-parang.jpg)
+
+*Batik Parang*
+
+![Alt text](images/batik-kawung.jpg)
+
+*Batik Kawung*
+
+![Alt text](images/batik-megamendung.jpg)
+
+*Batik Megamendung*
 
 ### Model Architecture
 The dataset was trained on MobileNetV2, a light CNN model provided by Tensorflow.
