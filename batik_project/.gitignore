@@ -26,3 +26,6 @@ __pycache__/
 .vscode/
 .idea/
 *.swp
+
+#Model
+*.keras
