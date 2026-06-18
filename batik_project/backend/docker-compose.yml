@@ -1,0 +1,27 @@
+version: "3.9"
+
+services: 
+  db: 
+    image: postgres:16
+    restart: always
+    environment: 
+      POSTGRES_USER: batik_user
+      POSTGRES_PASSWORD: batik_pass
+      POSTGRES_DB: batik_db
+    ports: 
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  api:
+    build: .
+    restart: always
+    ports: 
+      - "8000:8000"
+    environment: 
+      DATABASE_URL: postgresql://batik_user:batik_pass@db:5432/batik_db
+    depends_on:
+      - db
+  
+volumes:
+  postgres_data:
